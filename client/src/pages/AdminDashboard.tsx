@@ -1026,10 +1026,76 @@ export default function AdminDashboard({ onLogout, userId = "admin-1" }: AdminDa
                           <p className="text-sm text-muted-foreground mt-4">Loading documents...</p>
                         </div>
                       ) : documentsData?.documents && documentsData.documents.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {documentsData.documents.map((doc, index) => (
-                            <DetailedDocumentCard key={`doc-${doc.id || index}`} doc={doc} onView={handleView} />
-                          ))}
+                        <div className="overflow-x-auto">
+                          <table className="w-full border-collapse text-sm" data-testid="table-admin-documents">
+                            <thead>
+                              <tr className="border-b bg-muted/50">
+                                <th className="text-left p-3 font-medium">Doc Number</th>
+                                <th className="text-left p-3 font-medium">Document Name</th>
+                                <th className="text-left p-3 font-medium">Rev</th>
+                                <th className="text-left p-3 font-medium">Status</th>
+                                <th className="text-left p-3 font-medium">Preparer</th>
+                                <th className="text-left p-3 font-medium">Date of Issue</th>
+                                <th className="text-left p-3 font-medium">Departments</th>
+                                <th className="text-left p-3 font-medium">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {documentsData.documents.map((doc, index) => (
+                                <tr 
+                                  key={`doc-${doc.id || index}`} 
+                                  className="border-b hover:bg-muted/30 transition-colors"
+                                  data-testid={`row-document-${doc.id}`}
+                                >
+                                  <td className="p-3 font-mono text-xs">{doc.docNumber}</td>
+                                  <td className="p-3">{doc.docName}</td>
+                                  <td className="p-3 text-center">{doc.revisionNo}</td>
+                                  <td className="p-3">
+                                    <Badge 
+                                      variant="outline" 
+                                      className={
+                                        doc.status.toLowerCase() === 'pending' ? 'bg-amber-500/10 text-amber-600' :
+                                        doc.status.toLowerCase() === 'approved' ? 'bg-blue-500/10 text-blue-600' :
+                                        doc.status.toLowerCase() === 'issued' ? 'bg-green-500/10 text-green-600' :
+                                        doc.status.toLowerCase() === 'declined' ? 'bg-red-500/10 text-red-600' :
+                                        'bg-gray-500/10 text-gray-600'
+                                      }
+                                    >
+                                      {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+                                    </Badge>
+                                  </td>
+                                  <td className="p-3">{doc.preparerName || 'Unknown'}</td>
+                                  <td className="p-3">{doc.dateOfIssue ? new Date(doc.dateOfIssue).toLocaleDateString() : '-'}</td>
+                                  <td className="p-3">
+                                    {doc.departments && doc.departments.length > 0 ? (
+                                      <span className="text-xs text-muted-foreground">
+                                        {doc.departments.slice(0, 2).map(d => d.name).join(', ')}
+                                        {doc.departments.length > 2 && ` +${doc.departments.length - 2}`}
+                                      </span>
+                                    ) : '-'}
+                                  </td>
+                                  <td className="p-3">
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => handleView({
+                                        id: doc.id,
+                                        docName: doc.docName,
+                                        docNumber: doc.docNumber,
+                                        status: doc.status.charAt(0).toUpperCase() + doc.status.slice(1) as "Pending" | "Approved" | "Declined" | "Issued",
+                                        dateOfIssue: doc.dateOfIssue ? new Date(doc.dateOfIssue).toISOString().split('T')[0] : '',
+                                        revisionNo: doc.revisionNo,
+                                        preparedBy: doc.preparerName || 'Unknown'
+                                      })}
+                                      data-testid={`button-view-${doc.id}`}
+                                    >
+                                      <Eye className="w-4 h-4" />
+                                    </Button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
                       ) : (
                         <div className="border rounded-lg p-12 text-center">
@@ -1042,17 +1108,53 @@ export default function AdminDashboard({ onLogout, userId = "admin-1" }: AdminDa
                     <TabsContent value="pending" className="mt-6">
                       {pendingDocs.length > 0 ? (
                         <div className="space-y-4">
-                          <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                          <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
                             <div className="flex items-center gap-2 mb-2">
                               <Clock className="w-4 h-4 text-amber-600" />
-                              <h4 className="font-medium text-amber-800">Pending Documents Workflow</h4>
+                              <h4 className="font-medium text-amber-800 dark:text-amber-200">Pending Documents Workflow</h4>
                             </div>
-                            <p className="text-sm text-amber-700">Documents waiting for approval or issue. Check current stage and responsible person.</p>
+                            <p className="text-sm text-amber-700 dark:text-amber-300">Documents waiting for approval or issue.</p>
                           </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {pendingDocs.map((doc, index) => (
-                              <DetailedDocumentCard key={`pending-${doc.id || index}`} doc={doc} onView={handleView} />
-                            ))}
+                          <div className="overflow-x-auto">
+                            <table className="w-full border-collapse text-sm">
+                              <thead>
+                                <tr className="border-b bg-muted/50">
+                                  <th className="text-left p-3 font-medium">Doc Number</th>
+                                  <th className="text-left p-3 font-medium">Document Name</th>
+                                  <th className="text-left p-3 font-medium">Rev</th>
+                                  <th className="text-left p-3 font-medium">Preparer</th>
+                                  <th className="text-left p-3 font-medium">Date of Issue</th>
+                                  <th className="text-left p-3 font-medium">Departments</th>
+                                  <th className="text-left p-3 font-medium">Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {pendingDocs.map((doc, index) => (
+                                  <tr key={`pending-${doc.id || index}`} className="border-b hover:bg-muted/30 transition-colors">
+                                    <td className="p-3 font-mono text-xs">{doc.docNumber}</td>
+                                    <td className="p-3">{doc.docName}</td>
+                                    <td className="p-3 text-center">{doc.revisionNo}</td>
+                                    <td className="p-3">{doc.preparerName || 'Unknown'}</td>
+                                    <td className="p-3">{doc.dateOfIssue ? new Date(doc.dateOfIssue).toLocaleDateString() : '-'}</td>
+                                    <td className="p-3">
+                                      {doc.departments && doc.departments.length > 0 ? (
+                                        <span className="text-xs text-muted-foreground">
+                                          {doc.departments.slice(0, 2).map(d => d.name).join(', ')}
+                                          {doc.departments.length > 2 && ` +${doc.departments.length - 2}`}
+                                        </span>
+                                      ) : '-'}
+                                    </td>
+                                    <td className="p-3">
+                                      <Button size="sm" variant="ghost" onClick={() => handleView({
+                                        id: doc.id, docName: doc.docName, docNumber: doc.docNumber,
+                                        status: "Pending", dateOfIssue: doc.dateOfIssue ? new Date(doc.dateOfIssue).toISOString().split('T')[0] : '',
+                                        revisionNo: doc.revisionNo, preparedBy: doc.preparerName || 'Unknown'
+                                      })}><Eye className="w-4 h-4" /></Button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
                           </div>
                         </div>
                       ) : (
@@ -1066,17 +1168,46 @@ export default function AdminDashboard({ onLogout, userId = "admin-1" }: AdminDa
                     <TabsContent value="approved" className="mt-6">
                       {approvedDocs.length > 0 ? (
                         <div className="space-y-4">
-                          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                             <div className="flex items-center gap-2 mb-2">
                               <CheckCircle className="w-4 h-4 text-blue-600" />
-                              <h4 className="font-medium text-blue-800">Approved Documents</h4>
+                              <h4 className="font-medium text-blue-800 dark:text-blue-200">Approved Documents</h4>
                             </div>
-                            <p className="text-sm text-blue-700">Documents approved and waiting for issue. Includes approval details and comments.</p>
+                            <p className="text-sm text-blue-700 dark:text-blue-300">Documents approved and waiting for issue.</p>
                           </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {approvedDocs.map((doc, index) => (
-                              <DetailedDocumentCard key={`approved-${doc.id || index}`} doc={doc} onView={handleView} />
-                            ))}
+                          <div className="overflow-x-auto">
+                            <table className="w-full border-collapse text-sm">
+                              <thead>
+                                <tr className="border-b bg-muted/50">
+                                  <th className="text-left p-3 font-medium">Doc Number</th>
+                                  <th className="text-left p-3 font-medium">Document Name</th>
+                                  <th className="text-left p-3 font-medium">Rev</th>
+                                  <th className="text-left p-3 font-medium">Preparer</th>
+                                  <th className="text-left p-3 font-medium">Approver</th>
+                                  <th className="text-left p-3 font-medium">Approved At</th>
+                                  <th className="text-left p-3 font-medium">Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {approvedDocs.map((doc, index) => (
+                                  <tr key={`approved-${doc.id || index}`} className="border-b hover:bg-muted/30 transition-colors">
+                                    <td className="p-3 font-mono text-xs">{doc.docNumber}</td>
+                                    <td className="p-3">{doc.docName}</td>
+                                    <td className="p-3 text-center">{doc.revisionNo}</td>
+                                    <td className="p-3">{doc.preparerName || 'Unknown'}</td>
+                                    <td className="p-3">{doc.approverName || '-'}</td>
+                                    <td className="p-3">{doc.approvedAt ? new Date(doc.approvedAt).toLocaleDateString() : '-'}</td>
+                                    <td className="p-3">
+                                      <Button size="sm" variant="ghost" onClick={() => handleView({
+                                        id: doc.id, docName: doc.docName, docNumber: doc.docNumber,
+                                        status: "Approved", dateOfIssue: doc.dateOfIssue ? new Date(doc.dateOfIssue).toISOString().split('T')[0] : '',
+                                        revisionNo: doc.revisionNo, preparedBy: doc.preparerName || 'Unknown'
+                                      })}><Eye className="w-4 h-4" /></Button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
                           </div>
                         </div>
                       ) : (
@@ -1090,17 +1221,46 @@ export default function AdminDashboard({ onLogout, userId = "admin-1" }: AdminDa
                     <TabsContent value="issued" className="mt-6">
                       {issuedDocs.length > 0 ? (
                         <div className="space-y-4">
-                          <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                          <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                             <div className="flex items-center gap-2 mb-2">
                               <Send className="w-4 h-4 text-green-600" />
-                              <h4 className="font-medium text-green-800">Issued Documents</h4>
+                              <h4 className="font-medium text-green-800 dark:text-green-200">Issued Documents</h4>
                             </div>
-                            <p className="text-sm text-green-700">Documents that have been issued and are active in the system.</p>
+                            <p className="text-sm text-green-700 dark:text-green-300">Documents that have been issued and are active.</p>
                           </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {issuedDocs.map((doc, index) => (
-                              <DetailedDocumentCard key={`issued-${doc.id || index}`} doc={doc} onView={handleView} />
-                            ))}
+                          <div className="overflow-x-auto">
+                            <table className="w-full border-collapse text-sm">
+                              <thead>
+                                <tr className="border-b bg-muted/50">
+                                  <th className="text-left p-3 font-medium">Doc Number</th>
+                                  <th className="text-left p-3 font-medium">Document Name</th>
+                                  <th className="text-left p-3 font-medium">Rev</th>
+                                  <th className="text-left p-3 font-medium">Preparer</th>
+                                  <th className="text-left p-3 font-medium">Issuer</th>
+                                  <th className="text-left p-3 font-medium">Issued At</th>
+                                  <th className="text-left p-3 font-medium">Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {issuedDocs.map((doc, index) => (
+                                  <tr key={`issued-${doc.id || index}`} className="border-b hover:bg-muted/30 transition-colors">
+                                    <td className="p-3 font-mono text-xs">{doc.docNumber}</td>
+                                    <td className="p-3">{doc.docName}</td>
+                                    <td className="p-3 text-center">{doc.revisionNo}</td>
+                                    <td className="p-3">{doc.preparerName || 'Unknown'}</td>
+                                    <td className="p-3">{doc.issuerName || '-'}</td>
+                                    <td className="p-3">{doc.issuedAt ? new Date(doc.issuedAt).toLocaleDateString() : '-'}</td>
+                                    <td className="p-3">
+                                      <Button size="sm" variant="ghost" onClick={() => handleView({
+                                        id: doc.id, docName: doc.docName, docNumber: doc.docNumber,
+                                        status: "Issued", dateOfIssue: doc.dateOfIssue ? new Date(doc.dateOfIssue).toISOString().split('T')[0] : '',
+                                        revisionNo: doc.revisionNo, preparedBy: doc.preparerName || 'Unknown'
+                                      })}><Eye className="w-4 h-4" /></Button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
                           </div>
                         </div>
                       ) : (
@@ -1114,17 +1274,48 @@ export default function AdminDashboard({ onLogout, userId = "admin-1" }: AdminDa
                     <TabsContent value="declined" className="mt-6">
                       {declinedDocs.length > 0 ? (
                         <div className="space-y-4">
-                          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                             <div className="flex items-center gap-2 mb-2">
                               <XCircle className="w-4 h-4 text-red-600" />
-                              <h4 className="font-medium text-red-800">Declined Documents</h4>
+                              <h4 className="font-medium text-red-800 dark:text-red-200">Declined Documents</h4>
                             </div>
-                            <p className="text-sm text-red-700">Documents that have been declined with reviewer comments and reasons.</p>
+                            <p className="text-sm text-red-700 dark:text-red-300">Documents that have been declined with comments.</p>
                           </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {declinedDocs.map((doc, index) => (
-                              <DetailedDocumentCard key={`declined-${doc.id || index}`} doc={doc} onView={handleView} />
-                            ))}
+                          <div className="overflow-x-auto">
+                            <table className="w-full border-collapse text-sm">
+                              <thead>
+                                <tr className="border-b bg-muted/50">
+                                  <th className="text-left p-3 font-medium">Doc Number</th>
+                                  <th className="text-left p-3 font-medium">Document Name</th>
+                                  <th className="text-left p-3 font-medium">Rev</th>
+                                  <th className="text-left p-3 font-medium">Preparer</th>
+                                  <th className="text-left p-3 font-medium">Declined By</th>
+                                  <th className="text-left p-3 font-medium">Remarks</th>
+                                  <th className="text-left p-3 font-medium">Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {declinedDocs.map((doc, index) => (
+                                  <tr key={`declined-${doc.id || index}`} className="border-b hover:bg-muted/30 transition-colors">
+                                    <td className="p-3 font-mono text-xs">{doc.docNumber}</td>
+                                    <td className="p-3">{doc.docName}</td>
+                                    <td className="p-3 text-center">{doc.revisionNo}</td>
+                                    <td className="p-3">{doc.preparerName || 'Unknown'}</td>
+                                    <td className="p-3">{doc.approverName || '-'}</td>
+                                    <td className="p-3 max-w-[200px] truncate" title={doc.declineRemarks || ''}>
+                                      {doc.declineRemarks || '-'}
+                                    </td>
+                                    <td className="p-3">
+                                      <Button size="sm" variant="ghost" onClick={() => handleView({
+                                        id: doc.id, docName: doc.docName, docNumber: doc.docNumber,
+                                        status: "Declined", dateOfIssue: doc.dateOfIssue ? new Date(doc.dateOfIssue).toISOString().split('T')[0] : '',
+                                        revisionNo: doc.revisionNo, preparedBy: doc.preparerName || 'Unknown'
+                                      })}><Eye className="w-4 h-4" /></Button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
                           </div>
                         </div>
                       ) : (

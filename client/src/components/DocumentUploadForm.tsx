@@ -176,14 +176,6 @@ export default function DocumentUploadForm({ onSubmit }: DocumentUploadFormProps
             )}
           />
 
-          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-            <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
-              📄 Header & Footer Auto-Extraction
-            </p>
-            <p className="text-xs text-blue-700 dark:text-blue-300">
-              Header and footer information will be automatically extracted from the first two and last two lines of your uploaded Word document.
-            </p>
-          </div>
         </Card>
 
         <Card className="p-6 border-blue-200 dark:border-blue-900">

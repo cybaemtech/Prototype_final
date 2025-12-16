@@ -5,14 +5,14 @@ Build a Document Management System with complete workflow (Creator → Approver 
 
 ## Completed Features
 
-### Core Infrastructure ✅
+### Core Infrastructure
 - [x] JSON file-based storage system with race condition protection
 - [x] Pre-seeded users (creator, approver, issuer accounts)
 - [x] Pre-seeded departments (ENG, QA, OPS, FIN, HR)
 - [x] Complete data model with documents, users, departments, and notifications
 - [x] Import migration from Replit Agent to Replit environment with tsx runtime fix
 
-### Creator Module ✅
+### Creator Module
 - [x] Login page with role selection (Creator, Approver, Issuer, Recipient, Admin)
 - [x] Creator dashboard showing pending/approved/declined documents
 - [x] Document creation form with all required fields
@@ -20,8 +20,9 @@ Build a Document Management System with complete workflow (Creator → Approver 
 - [x] Fixed critical bug where document submissions weren't persisting to backend API
 - [x] Document view dialog with full metadata display
 - [x] Notification system for document status changes
+- [x] Removed Header & Footer Auto-Extraction message from upload form (December 16, 2025)
 
-### Approver Module ✅
+### Approver Module
 - [x] Approver dashboard showing pending approvals
 - [x] Document review interface
 - [x] Approve/Decline functionality with remarks
@@ -38,7 +39,7 @@ Build a Document Management System with complete workflow (Creator → Approver 
   - [x] Selected departments displayed as removable chips/tags (first 6 + "+X more")
   - [x] Department data stored in JSON format (shared/departmentData.json)
 
-### Issuer Module ✅
+### Issuer Module
 - [x] Issuer dashboard connected to real API (no mock data)
 - [x] Fetch approved documents awaiting issuance
 - [x] Fetch issued documents for tracking
@@ -54,7 +55,13 @@ Build a Document Management System with complete workflow (Creator → Approver 
 - [x] Notification system targeting only creator and approver (no spam)
 - [x] Complete API integration with mutations and cache invalidation
 
-### Document Management ✅
+### Administrator Module (December 16, 2025)
+- [x] Updated Documents tab to display data in Excel-like table format
+- [x] All document tabs (All, Pending, Approved, Issued, Declined) now use table layout
+- [x] Table columns include: Doc Number, Document Name, Rev, Status, Preparer, Date of Issue, Departments, Actions
+- [x] Dark mode support for status banners
+
+### Document Management
 - [x] Document numbering system
 - [x] Revision tracking with previous version references
 - [x] Header and footer information storage
@@ -62,7 +69,7 @@ Build a Document Management System with complete workflow (Creator → Approver 
 - [x] Status workflow (pending → approved/declined → issued)
 - [x] Timestamp tracking for all workflow stages
 
-### Notification System ✅
+### Notification System
 - [x] Real-time notifications for all workflow events
 - [x] Targeted notifications (creator, approver, issuer)
 - [x] Notification count badges
@@ -86,6 +93,11 @@ Build a Document Management System with complete workflow (Creator → Approver 
 - JSON file-based storage with write serialization
 - Complete CRUD operations for all entities
 
+### Data Storage
+- All data stored in JSON format
+- JSON files for documents, users, departments, notifications
+- Department data stored in shared/departmentData.json
+
 ### API Endpoints
 - `GET /api/documents` - Retrieve documents by status/user
 - `GET /api/documents/:id` - Retrieve single document with full details
@@ -99,36 +111,25 @@ Build a Document Management System with complete workflow (Creator → Approver 
 
 ## Migration to Replit Environment
 
-### Migration Tasks ✅
+### Migration Tasks
 - [x] Install npm dependencies (tsx and all required packages including cross-env)
 - [x] Restart workflow to verify project runs correctly
 - [x] Verify application loads and displays login page
 - [x] Mark import as completed
 
-### Latest Migration Session (December 12, 2025) ✅
-- [x] Installed cross-env package via npm
-- [x] Installed system dependencies for Chromium/Puppeteer (glib, nss, X11 libraries, gtk3, mesa, libxkbcommon, etc.)
-- [x] Installed Chromium system package for Puppeteer PDF generation
-- [x] Set PUPPETEER_EXECUTABLE_PATH environment variable to system Chromium path
-- [x] Puppeteer test now passes successfully - PDF generation fully operational
-- [x] Restarted workflow successfully - application running on port 5000
-- [x] Verified Express server is serving on port 5000
-- [x] Confirmed Vite connected and browser console shows no critical errors
-- [x] All migration tasks completed successfully
-
-### Current Session Migration (December 16, 2025) ✅
+### Latest Migration Session (December 16, 2025)
 - [x] Re-installed cross-env package (was missing from node_modules)
 - [x] Configured workflow with webview output type on port 5000
 - [x] Verified application running and login page displaying correctly
-- [x] Screenshot confirmed UI rendering properly with all features visible
-- [x] Import migration completed successfully
+- [x] Removed Header & Footer Auto-Extraction message from DocumentUploadForm
+- [x] Updated Admin dashboard documents tab to Excel-like table format
+- [x] All document status tabs converted to table format
 
 ## Known Issues
 - Puppeteer socket hang up warning during startup (non-blocking, PDF generation may have issues)
 
 ## Future Enhancements
 - [ ] Recipient dashboard for viewing issued documents
-- [ ] Admin dashboard for system management
 - [ ] Advanced search and filtering
 - [ ] Email notifications
 - [ ] Audit trail and comprehensive reporting
